@@ -58,6 +58,24 @@ git push -u origin main
 4. Deploy → Coolify akan build image per commit dan jalankan container otomatis.
 5. Gunakan fitur *Clone Deployment* di Coolify untuk sekolah baru: cukup ubah nama resource + port supaya terpisah.
 
+## Bangun image lewat GitHub Actions
+
+- Workflow `Build School Image` (lihat `.github/workflows/build-image.yml`) bisa dijalankan manual dari tab **Actions → Run workflow**.
+- Input yang diminta:
+  - `image_tag`: nama tag unik per sekolah (mis. `school-01`).
+  - `laravel_repo`, `ci_a_repo`, `ci_b_repo`: otomatis terisi URL repo milik MMT-Indonesia (`absensi-laravel-vue`, `mmt-tagihan-baru-dafi`, `mobile-akademik-holistik`). Ganti kalau perlu repo lain.
+  - `laravel_ref`, `ci_a_ref`, `ci_b_ref`: branch atau tag (default `main`).
+  - `push_latest`: isi `true` kalau mau tag tambahan `latest`.
+- Workflow otomatis:
+  1. Checkout repo template ini.
+  2. Build image dengan Docker build arg sesuai input.
+  3. Push image ke GitHub Container Registry `ghcr.io/<owner>/school:<tag>` (akses lewat `docker pull ghcr.io/<owner>/school:<tag>`).
+- Setting awal yang perlu kamu buat di repo GitHub:
+  1. Aktifkan GHCR di akun (sekali saja).
+  2. Buat **Personal Access Token (classic)** dengan scope `repo` untuk mengakses repo privat.
+  3. Simpan token di **Repository Secrets** dengan nama `PRIVATE_GIT_TOKEN` (dan `PRIVATE_GIT_USERNAME` kalau akun git kamu bukan default `x-access-token`). Workflow otomatis menambahkan kredensial itu saat clone, jadi kamu tetap mengisi URL standar `https://github.com/org/repo.git` di input.
+- Setelah image ada di GHCR, Coolify bisa langsung deploy via opsi *Docker Image* (cukup isi `ghcr.io/<owner>/school:<tag>` dan expose port). Ulangi workflow untuk sekolah baru agar setiap sekolah punya tag image sendiri tanpa build lokal.
+
 ## Catatan penting
 
 - Ganti password default (`devschool`, `ChangeMeNow!`, `ChangeMe123!`) sebelum produksi.
