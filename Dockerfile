@@ -10,31 +10,49 @@ ARG CI_B_REF="main"
 ARG GIT_USERNAME="x-access-token"
 ARG GIT_TOKEN=""
 
-# Core packages
+# Core packages + multi-PHP runtime (8.4 for Laravel, 7.4 for CI3)
 RUN apt-get update \
  && apt-get install -y --no-install-recommends \
     ca-certificates \
     curl \
     git \
+    gnupg \
+    lsb-release \
+    software-properties-common \
+    unzip \
+    zip \
+ && add-apt-repository -y ppa:ondrej/php \
+ && apt-get update \
+ && apt-get install -y --no-install-recommends \
     gosu \
     mariadb-server \
     nginx \
     openssh-server \
-    php8.2 \
-    php8.2-bcmath \
-    php8.2-cli \
-    php8.2-curl \
-    php8.2-fpm \
-    php8.2-intl \
-    php8.2-mbstring \
-    php8.2-mysql \
-    php8.2-xml \
-    php8.2-zip \
+    php8.4 \
+    php8.4-bcmath \
+    php8.4-cli \
+    php8.4-curl \
+    php8.4-fpm \
+    php8.4-intl \
+    php8.4-mbstring \
+    php8.4-mysql \
+    php8.4-xml \
+    php8.4-zip \
+    php7.4 \
+    php7.4-cli \
+    php7.4-curl \
+    php7.4-fpm \
+   php7.4-intl \
+    php7.4-mbstring \
+    php7.4-mysql \
+   php7.4-xml \
+   php7.4-zip \
     supervisor \
-    unzip \
-    zip \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
+
+# Default CLI PHP to 8.4
+RUN update-alternatives --set php /usr/bin/php8.4
 
 # Composer
 RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
@@ -76,6 +94,7 @@ RUN set -e; \
          && git clone --depth 1 --branch "$CI_B_REF" "$REPO_URL" /srv/www/ci-b \
          && rm -rf /srv/www/ci-b/.git; \
       fi; \
+      rm -f /tmp/git_*; \
       unset GIT_TOKEN AUTH_PREFIX REPO_URL
 
 # Nginx configuration
