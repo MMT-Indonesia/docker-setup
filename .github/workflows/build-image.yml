@@ -49,6 +49,13 @@ jobs:
       - name: Checkout template repo
         uses: actions/checkout@v4
 
+      - name: Set lowercase owner
+        id: owner
+        run: |
+          OWNER_LC=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+          echo "owner_lc=$OWNER_LC" >> $GITHUB_ENV
+          echo "🔡 Repository owner lowercase: $OWNER_LC"
+
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v3
 
@@ -69,7 +76,7 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/school:${{ inputs.image_tag }}
+            ghcr.io/${{ env.owner_lc }}/school:${{ inputs.image_tag }}
           build-args: |
             LARAVEL_REPO=${{ inputs.laravel_repo }}
             LARAVEL_REF=${{ inputs.laravel_ref }}
@@ -83,5 +90,5 @@ jobs:
       - name: Push latest tag
         if: inputs.push_latest == 'true'
         run: |
-          docker tag ghcr.io/${{ github.repository_owner }}/school:${{ inputs.image_tag }} ghcr.io/${{ github.repository_owner }}/school:latest
-          docker push ghcr.io/${{ github.repository_owner }}/school:latest
+          docker tag ghcr.io/${{ env.owner_lc }}/school:${{ inputs.image_tag }} ghcr.io/${{ env.owner_lc }}/school:latest
+          docker push ghcr.io/${{ env.owner_lc }}/school:latest
