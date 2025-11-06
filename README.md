@@ -2,7 +2,7 @@
 
 Struktur ini menyiapkan image Docker dengan satu container berisi Laravel + dua CodeIgniter sekaligus, lengkap dengan Nginx, PHP-FPM, MariaDB, dan SFTP/SSH. Setiap sekolah dibangun menjadi image berbeda sehingga tidak ada bind mount: update file cukup dilakukan via SFTP lalu `docker commit` jika mau disimpan permanen.
 
-## Cara pakai singkat
+## Cara pakai singkat test
 
 1. **Pilih sumber kode**:
   - **Lokal**: letakkan source di `apps/laravel-main`, `apps/ci-a`, `apps/ci-b` sebelum build.
