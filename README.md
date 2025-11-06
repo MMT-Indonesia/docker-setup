@@ -69,7 +69,7 @@ git push -u origin main
 - Workflow otomatis:
   1. Checkout repo template ini.
   2. Build image dengan Docker build arg sesuai input.
-  3. Push image ke GitHub Container Registry `ghcr.io/<owner>/school:<tag>` (akses lewat `docker pull ghcr.io/<owner>/school:<tag>`).
+  3. Push image ke GitHub Container Registry `ghcr.io/<owner_lower>/school:<tag>` (owner otomatis dijadikan huruf kecil agar sesuai aturan GHCR).
 - Setting awal yang perlu kamu buat di repo GitHub:
   1. Aktifkan GHCR di akun (sekali saja).
   2. Buat **Personal Access Token (classic)** dengan scope `repo` untuk mengakses repo privat.
