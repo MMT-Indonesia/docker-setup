@@ -69,7 +69,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Build & push image
+      - name: Build & push image to GHCR
         id: build
         uses: docker/build-push-action@v5
         with:
@@ -87,8 +87,27 @@ jobs:
             GIT_USERNAME=${{ env.GIT_USERNAME }}
             GIT_TOKEN=${{ env.GIT_TOKEN }}
 
-      - name: Push latest tag
+      - name: Push latest tag (GHCR)
         if: inputs.push_latest == 'true'
         run: |
           docker tag ghcr.io/${{ env.owner_lc }}/school:${{ inputs.image_tag }} ghcr.io/${{ env.owner_lc }}/school:latest
           docker push ghcr.io/${{ env.owner_lc }}/school:latest
+
+      # 🧩 Tambahan: Mirror image ke Docker Hub
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Tag and push to Docker Hub
+        run: |
+          docker tag ghcr.io/${{ env.owner_lc }}/school:${{ inputs.image_tag }} \
+            ${{ secrets.DOCKERHUB_USERNAME }}/school:${{ inputs.image_tag }}
+          docker push ${{ secrets.DOCKERHUB_USERNAME }}/school:${{ inputs.image_tag }}
+
+          if [ "${{ inputs.push_latest }}" = "true" ]; then
+            docker tag ${{ secrets.DOCKERHUB_USERNAME }}/school:${{ inputs.image_tag }} \
+              ${{ secrets.DOCKERHUB_USERNAME }}/school:latest
+            docker push ${{ secrets.DOCKERHUB_USERNAME }}/school:latest
+          fi
